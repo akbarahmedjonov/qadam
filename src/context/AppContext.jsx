@@ -221,6 +221,13 @@ export function AppProvider({ children }) {
     })
   }, [save, addToast])
 
+  const signOut = useCallback(() => {
+    setUserProfile(null)
+    localStorage.removeItem(STORAGE_KEYS.userProfile)
+    setPage('landing')
+    addToast("Hisobdan chiqildi", 'info')
+  }, [addToast])
+
   const saveProfile = useCallback((profile) => {
     setUserProfile(profile)
     save(STORAGE_KEYS.userProfile, profile)
@@ -244,7 +251,7 @@ export function AppProvider({ children }) {
       addClass, updateClass, deleteClass,
       addHomework, updateHomework, toggleHomework, deleteHomework,
       addActivity, updateActivity, deleteActivity,
-      saveProfile, updateProfile,
+      saveProfile, updateProfile, signOut,
     }}>
       {children}
     </AppContext.Provider>

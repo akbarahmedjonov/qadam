@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Footprints, X, Home, Calendar, BookOpen, Gamepad2, Moon, Sun, Settings, User, Menu } from 'lucide-react'
+import { Footprints, X, Home, Calendar, BookOpen, Gamepad2, Moon, Sun, Settings, User, Menu, LogOut } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 import { PAGES } from '../utils/constants'
 
 export default function Sidebar({ onNavigate }) {
-  const { theme, toggleTheme, page, userProfile, openModal } = useApp()
+  const { theme, toggleTheme, page, userProfile, openModal, signOut } = useApp()
   const [mobileOpen, setMobileOpen] = useState(false)
 
   const handleNav = (key) => {
@@ -32,17 +32,24 @@ export default function Sidebar({ onNavigate }) {
           {PAGES.map(p => {
             const icons = { Home, Calendar, BookOpen, Gamepad2 }
             const Icon = icons[p.icon]
+            const isActive = page === p.key
             return (
-              <li key={p.key}>
-                <button
+              <li key={p.key} className="relative">
+                <motion.button
+                  initial={false}
+                  animate={{ backgroundColor: isActive ? 'var(--color-border)' : 'transparent' }}
                   onClick={() => handleNav(p.key)}
-                  className={`nav-link-custom w-full flex items-center gap-3 text-left ${
-                    page === p.key ? 'active' : ''
-                  }`}
+                  className="nav-link-custom w-full flex items-center gap-3 text-left"
                 >
                   <Icon className="w-[18px] h-[18px]" />
                   <span>{p.label}</span>
-                </button>
+                </motion.button>
+                {isActive && (
+                  <motion.div
+                    layoutId="page-indicator"
+                    className="absolute left-0 top-1 bottom-1 w-0.5 rounded-r-full bg-cyan"
+                  />
+                )}
               </li>
             )
           })}
@@ -85,6 +92,14 @@ export default function Sidebar({ onNavigate }) {
             </div>
           </div>
           <Settings className="w-4 h-4 text-text-dim shrink-0" />
+        </button>
+
+        <button
+          onClick={signOut}
+          className="w-full flex items-center justify-center gap-2 p-2.5 rounded-lg text-text-dim hover:text-red-500 hover:bg-red-500/10 border border-border transition-colors"
+        >
+          <LogOut className="w-4 h-4" />
+          <span className="text-sm font-medium">Chiqish</span>
         </button>
       </div>
     </div>
