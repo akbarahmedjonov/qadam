@@ -1,13 +1,15 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { UserCircle, Camera, User, X } from 'lucide-react'
+import { UserCircle, Camera, User, X, Key, Loader2 } from 'lucide-react'
 import { useApp } from '../context/AppContext'
+import { auth } from '../firebase'
 
 export default function ProfileModal() {
-  const { modals, closeModal, userProfile, updateProfile, addToast } = useApp()
+  const { modals, closeModal, userProfile, updateProfile, addToast, resetPassword } = useApp()
   const [name, setName] = useState('')
   const [surname, setSurname] = useState('')
   const [preview, setPreview] = useState(null)
+  const [pwLoading, setPwLoading] = useState(false)
   const fileRef = useRef(null)
 
   useEffect(() => {
@@ -41,6 +43,20 @@ export default function ProfileModal() {
     closeModal('profile')
   }
 
+  const handleResetPassword = async () => {
+    if (!auth.currentUser?.email) return
+    setPwLoading(true)
+    try {
+      await resetPassword(auth.currentUser.email)
+      addToast('Parolni tiklash havolasi emailingizga yuborildi', 'success')
+      closeModal('profile')
+    } catch {
+      addToast('Xatolik yuz berdi. Qayta urinib ko\'ring', 'error')
+    } finally {
+      setPwLoading(false)
+    }
+  }
+
   return (
     <AnimatePresence>
       {modals.profile && (
@@ -60,6 +76,9 @@ export default function ProfileModal() {
               <h5 className="font-heading font-semibold mb-0 flex items-center gap-2">
                 <UserCircle className="w-5 h-5 text-cyan" />
                 Profil sozlamalari
+                {userProfile?.email && (
+                  <span className="ml-auto text-xs text-text-dim font-normal">{userProfile.email}</span>
+                )}
               </h5>
               <button
                 onClick={() => closeModal('profile')}
@@ -114,7 +133,25 @@ export default function ProfileModal() {
                 </div>
               </div>
 
-              <div className="flex gap-3 mt-5">
+              <div className="mt-5 pt-4 border-t border-border">
+                <motion.button
+                  type="button"
+                  onClick={handleResetPassword}
+                  disabled={pwLoading}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="btn-custom w-full border border-border text-text-dim hover:text-text-main hover:bg-border transition-colors flex items-center justify-center gap-2 disabled:opacity-60"
+                >
+                  {pwLoading ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Key className="w-4 h-4" />
+                  )}
+                  Parolni o'zgartirish
+                </motion.button>
+              </div>
+
+              <div className="flex gap-3 mt-4">
                 <button
                   type="button"
                   onClick={() => closeModal('profile')}

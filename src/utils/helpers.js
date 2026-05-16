@@ -26,11 +26,10 @@ export function formatFullDate() {
 
 export function formatClockTime() {
   const now = new Date()
-  const h = now.getHours() % 12 || 12
+  const h = now.getHours().toString().padStart(2, '0')
   const m = now.getMinutes().toString().padStart(2, '0')
   const s = now.getSeconds().toString().padStart(2, '0')
-  const ampm = now.getHours() < 12 ? 'AM' : 'PM'
-  return `${h}:${m}:${s} ${ampm}`
+  return `${h}:${m}:${s}`
 }
 
 export function hasCollision(newClass, existingClasses, excludeId = null) {

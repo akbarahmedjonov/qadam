@@ -87,9 +87,6 @@ export default function Sidebar({ onNavigate }) {
             <div className="font-semibold text-sm truncate text-text-main">
               {userProfile?.name || 'Foydalanuvchi'}
             </div>
-            <div className="text-xs text-text-dim truncate">
-              {userProfile?.surname || ''}
-            </div>
           </div>
           <Settings className="w-4 h-4 text-text-dim shrink-0" />
         </button>

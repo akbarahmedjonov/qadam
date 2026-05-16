@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { AppProvider, useApp } from './context/AppContext'
 import Layout from './components/Layout'
 import LandingPage from './pages/LandingPage'
@@ -6,7 +5,6 @@ import HomePage from './pages/HomePage'
 import TimetablePage from './pages/TimetablePage'
 import HomeworkPage from './pages/HomeworkPage'
 import ExtracurricularPage from './pages/ExtracurricularPage'
-import SetupModal from './components/SetupModal'
 import ProfileModal from './components/ProfileModal'
 import ClassModal from './components/ClassModal'
 import HomeworkModal from './components/HomeworkModal'
@@ -14,13 +12,15 @@ import ActivityModal from './components/ActivityModal'
 import ToastContainer from './components/Toast'
 
 function AppContent() {
-  const { page, isFirstLaunch, openModal } = useApp()
+  const { page, authLoading, dataLoading } = useApp()
 
-  useEffect(() => {
-    if (isFirstLaunch && page === 'home') {
-      openModal('setup')
-    }
-  }, [isFirstLaunch, page, openModal])
+  if (authLoading || dataLoading) {
+    return (
+      <div className="min-h-screen bg-surface flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan"></div>
+      </div>
+    )
+  }
 
   if (page === 'landing') {
     return (
@@ -47,7 +47,6 @@ function AppContent() {
         {renderPage()}
       </Layout>
       <ToastContainer />
-      <SetupModal />
       <ProfileModal />
       <ClassModal />
       <HomeworkModal />
