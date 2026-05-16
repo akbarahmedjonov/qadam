@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-surface: hsl(210, 17%, 98%);
+    --color-surface-raised: hsl(0, 0%, 100%);
+    --color-text-main: hsl(210, 10%, 12%);
+    --color-text-dim: hsl(210, 10%, 45%);
+    --color-border: hsl(210, 14%, 89%);
+    --color-card: hsl(0, 0%, 100%);
+    --color-fox: hsl(24, 94%, 53%);
+  }
+
+  .dark {
+    --color-surface: hsl(0, 0%, 7%);
+    --color-surface-raised: hsl(0, 0%, 12%);
+    --color-text-main: hsl(0, 0%, 88%);
+    --color-text-dim: hsl(0, 0%, 63%);
+    --color-border: hsl(0, 0%, 20%);
+    --color-card: hsl(0, 0%, 12%);
+    --color-fox: hsl(27, 96%, 61%);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html, body, #root {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+  }
+
+  body {
+    transition: background-color 0.3s, color 0.3s;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text-dim);
+  }
+}
+
+@layer components {
+  .card-custom {
+    @apply bg-card-bg border border-border rounded-xl transition-colors duration-300;
+  }
+
+  .nav-link-custom {
+    @apply text-text-dim rounded-lg px-4 py-3 transition-all duration-200 font-medium text-sm;
+  }
+
+  .nav-link-custom:hover {
+    @apply bg-border text-text-main;
+  }
+
+  .nav-link-custom.active {
+    @apply bg-cyan text-white;
+  }
+
+  .btn-custom {
+    @apply font-medium text-sm rounded-lg transition-all duration-200 px-4 py-2;
+  }
+
+  .btn-cyan {
+    @apply bg-cyan text-white hover:bg-cyan-hover;
+  }
+
+  .btn-magenta {
+    @apply bg-magenta text-white hover:bg-magenta-hover;
+  }
+
+  .btn-lime {
+    @apply bg-lime text-white hover:bg-lime-hover;
+  }
+
+  .form-custom {
+    @apply bg-surface-raised border border-border text-text-main text-sm rounded-lg w-full px-3 py-2.5 outline-none transition-colors duration-200;
+  }
+
+  .form-custom:focus {
+    @apply border-cyan;
+  }
+
+  .profile-photo {
+    @apply rounded-full object-cover border-2 border-cyan;
+  }
+
+  .profile-photo-placeholder {
+    @apply w-10 h-10 rounded-full bg-border flex items-center justify-center text-text-dim shrink-0;
+  }
+
+  .neon-glow-cyan {
+    box-shadow: 0 0 20px hsla(211, 95%, 52%, 0.4);
+  }
+
+  .neon-glow-magenta {
+    box-shadow: 0 0 20px hsla(330, 68%, 52%, 0.4);
+  }
+
+  .neon-glow-lime {
+    box-shadow: 0 0 20px hsla(152, 69%, 31%, 0.4);
+  }
+}
