@@ -22,7 +22,7 @@ export default function Sidebar({ onNavigate }) {
             <span className="hidden sm:inline">Qadam</span>
           </h4>
           <button
-            className="btn btn-sm md:hidden p-1 text-text-dim hover:text-text-main"
+            className="md:hidden p-1 text-text-dim hover:text-text-main"
             onClick={() => setMobileOpen(false)}
           >
             <X className="w-4 h-4" />

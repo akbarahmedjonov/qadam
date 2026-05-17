@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { UserCircle, Camera, User, X, Key, Loader2 } from 'lucide-react'
 import { useApp } from '../context/AppContext'
@@ -6,19 +6,11 @@ import { auth } from '../firebase'
 
 export default function ProfileModal() {
   const { modals, closeModal, userProfile, updateProfile, addToast, resetPassword } = useApp()
-  const [name, setName] = useState('')
-  const [surname, setSurname] = useState('')
-  const [preview, setPreview] = useState(null)
+  const [name, setName] = useState(userProfile?.name || '')
+  const [surname, setSurname] = useState(userProfile?.surname || '')
+  const [preview, setPreview] = useState(userProfile?.photo || null)
   const [pwLoading, setPwLoading] = useState(false)
   const fileRef = useRef(null)
-
-  useEffect(() => {
-    if (modals.profile && userProfile) {
-      setName(userProfile.name || '')
-      setSurname(userProfile.surname || '')
-      setPreview(userProfile.photo || null)
-    }
-  }, [modals.profile, userProfile])
 
   const handleFile = (e) => {
     const file = e.target.files[0]

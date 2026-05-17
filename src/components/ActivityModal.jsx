@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Gamepad2, Pencil, X } from 'lucide-react'
 import { useApp } from '../context/AppContext'
@@ -10,21 +10,9 @@ export default function ActivityModal() {
   const editing = modals.activity.editing
   const isEditing = !!editing
 
-  const [name, setName] = useState('')
-  const [category, setCategory] = useState('sports')
-  const [schedule, setSchedule] = useState('')
-
-  useEffect(() => {
-    if (editing) {
-      setName(editing.name || '')
-      setCategory(editing.category || 'sports')
-      setSchedule(editing.schedule || '')
-    } else {
-      setName('')
-      setCategory('sports')
-      setSchedule('')
-    }
-  }, [editing, modals.activity.open])
+  const [name, setName] = useState(editing?.name || '')
+  const [category, setCategory] = useState(editing?.category || 'sports')
+  const [schedule, setSchedule] = useState(editing?.schedule || '')
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -48,6 +36,7 @@ export default function ActivityModal() {
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60"
         >
           <motion.div
+            key={editing?.id || 'new'}
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}

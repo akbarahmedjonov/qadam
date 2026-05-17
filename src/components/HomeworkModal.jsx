@@ -1,32 +1,18 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { BookOpen, Pencil, X, FileText, Trophy } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 
 export default function HomeworkModal() {
-  const { modals, closeModal, addHomework, updateHomework, homework, recentSubjects } = useApp()
+  const { modals, closeModal, addHomework, updateHomework, recentSubjects } = useApp()
 
   const editing = modals.homework.editing
   const isEditing = !!editing
 
-  const [title, setTitle] = useState('')
-  const [subject, setSubject] = useState('')
-  const [dueDate, setDueDate] = useState('')
-  const [type, setType] = useState('homework')
-
-  useEffect(() => {
-    if (editing) {
-      setTitle(editing.title || '')
-      setSubject(editing.subject || '')
-      setDueDate(editing.dueDate || '')
-      setType(editing.type || 'homework')
-    } else {
-      setTitle('')
-      setSubject('')
-      setDueDate('')
-      setType('homework')
-    }
-  }, [editing, modals.homework.open])
+  const [title, setTitle] = useState(editing?.title || '')
+  const [subject, setSubject] = useState(editing?.subject || '')
+  const [dueDate, setDueDate] = useState(editing?.dueDate || '')
+  const [type, setType] = useState(editing?.type || 'homework')
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -50,6 +36,7 @@ export default function HomeworkModal() {
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60"
         >
           <motion.div
+            key={editing?.id || 'new'}
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}

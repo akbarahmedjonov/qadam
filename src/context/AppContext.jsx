@@ -30,14 +30,25 @@ export function AppProvider({ children }) {
 
   const unsubscribers = useRef(null)
 
+  const addToast = useCallback((message, type = 'info', undoCallback = null) => {
+    const id = generateId()
+    setToasts(prev => [...prev, { id, message, type, undoCallback }])
+    setTimeout(() => {
+      setToasts(prev => prev.filter(t => t.id !== id))
+    }, 5000)
+  }, [])
+
+  const removeToast = useCallback((id) => {
+    setToasts(prev => prev.filter(t => t.id !== id))
+  }, [])
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user)
       if (user) {
         const cached = localGet(STORAGE_KEYS.userProfile)
         if (cached) {
-          cached.email = user.email
-          setUserProfile(cached)
+          setUserProfile({ ...cached, email: user.email })
         }
         try {
           const profileDoc = await getDoc(doc(db, 'users', user.uid))
@@ -63,6 +74,7 @@ export function AppProvider({ children }) {
       } else {
         setUserProfile(null)
         setPage('landing')
+        setDataLoading(false)
       }
       setAuthLoading(false)
     })
@@ -75,13 +87,7 @@ export function AppProvider({ children }) {
       unsubscribers.current = null
     }
 
-    if (!currentUser) {
-      setClasses(localGet(STORAGE_KEYS.classes) || [])
-      setHomework(localGet(STORAGE_KEYS.homework) || [])
-      setExtracurriculars(localGet(STORAGE_KEYS.extracurriculars) || [])
-      setDataLoading(false)
-      return
-    }
+    if (!currentUser) return
 
     const uid = currentUser.uid
     const loaded = { classes: false, homework: false, extracurriculars: false }
@@ -151,7 +157,7 @@ export function AppProvider({ children }) {
       unsubHomework()
       unsubExtracurriculars()
     }
-  }, [currentUser])
+  }, [currentUser, addToast])
 
   const addRecentSubject = useCallback((subject) => {
     if (!subject) return
@@ -180,18 +186,6 @@ export function AppProvider({ children }) {
     }
     localStorage.setItem('theme', theme)
   }, [theme])
-
-  const addToast = useCallback((message, type = 'info', undoCallback = null) => {
-    const id = generateId()
-    setToasts(prev => [...prev, { id, message, type, undoCallback }])
-    setTimeout(() => {
-      setToasts(prev => prev.filter(t => t.id !== id))
-    }, 5000)
-  }, [])
-
-  const removeToast = useCallback((id) => {
-    setToasts(prev => prev.filter(t => t.id !== id))
-  }, [])
 
   const toggleTheme = useCallback(() => {
     setTheme(prev => prev === 'dark' ? 'light' : 'dark')
@@ -439,6 +433,9 @@ export function AppProvider({ children }) {
 
   const signOut = useCallback(async () => {
     await firebaseSignOut(auth)
+    setClasses([])
+    setHomework([])
+    setExtracurriculars([])
     addToast("Hisobdan chiqildi", 'info')
   }, [addToast])
 
@@ -494,6 +491,7 @@ export function AppProvider({ children }) {
   )
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useApp() {
   const ctx = useContext(AppContext)
   if (!ctx) throw new Error('useApp must be used within AppProvider')

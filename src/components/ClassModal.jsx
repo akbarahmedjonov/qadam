@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { PlusCircle, Pencil, X } from 'lucide-react'
 import { useApp } from '../context/AppContext'
@@ -11,24 +11,10 @@ export default function ClassModal() {
   const editing = modals.class.editing
   const isEditing = !!editing
 
-  const [name, setName] = useState('')
-  const [day, setDay] = useState('dushanba')
-  const [startTime, setStartTime] = useState('08:30')
-  const [endTime, setEndTime] = useState('09:15')
-
-  useEffect(() => {
-    if (editing) {
-      setName(editing.name || '')
-      setDay(editing.day || 'dushanba')
-      setStartTime(editing.startTime || '08:30')
-      setEndTime(editing.endTime || '09:15')
-    } else {
-      setName('')
-      setDay('dushanba')
-      setStartTime('08:30')
-      setEndTime('09:15')
-    }
-  }, [editing, modals.class.open])
+  const [name, setName] = useState(editing?.name || '')
+  const [day, setDay] = useState(editing?.day || 'dushanba')
+  const [startTime, setStartTime] = useState(editing?.startTime || '08:30')
+  const [endTime, setEndTime] = useState(editing?.endTime || '09:15')
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -57,6 +43,7 @@ export default function ClassModal() {
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60"
         >
           <motion.div
+            key={editing?.id || 'new'}
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
