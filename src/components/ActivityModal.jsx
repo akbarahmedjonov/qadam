@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Gamepad2, Pencil, X } from 'lucide-react'
 import { useApp } from '../context/AppContext'
-import { CATEGORIES } from '../utils/constants'
+import { CATEGORIES, DAY_NAMES } from '../utils/constants'
 
 export default function ActivityModal() {
   const { modals, closeModal, addActivity, updateActivity } = useApp()
@@ -12,11 +12,13 @@ export default function ActivityModal() {
 
   const [name, setName] = useState(editing?.name || '')
   const [category, setCategory] = useState(editing?.category || 'sports')
-  const [schedule, setSchedule] = useState(editing?.schedule || '')
+  const [day, setDay] = useState(editing?.day || '')
+  const [startTime, setStartTime] = useState(editing?.startTime || '')
+  const [endTime, setEndTime] = useState(editing?.endTime || '')
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    const activityData = { name: name.trim(), category, schedule: schedule.trim() }
+    const activityData = { name: name.trim(), category, day, startTime: startTime.trim(), endTime: endTime.trim() }
 
     if (isEditing) {
       updateActivity(editing.id, activityData)
@@ -77,16 +79,23 @@ export default function ActivityModal() {
                 </select>
               </div>
               <div>
-                <label className="text-sm font-medium mb-1 block text-text-main">
-                  Grafik (ixtiyoriy)
-                </label>
-                <input
-                  type="text"
-                  value={schedule}
-                  onChange={e => setSchedule(e.target.value)}
-                  placeholder="Masalan, Dush va Sesh 16:00-18:00"
-                  className="form-custom"
-                />
+                <label className="text-sm font-medium mb-1 block text-text-main">Kun</label>
+                <select value={day} onChange={e => setDay(e.target.value)} className="form-custom">
+                  <option value="">Kun tanlanmagan</option>
+                  {DAY_NAMES.map(d => (
+                    <option key={d} value={d}>{d.charAt(0).toUpperCase() + d.slice(1)}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-sm font-medium mb-1 block text-text-main">Boshlanish vaqti</label>
+                  <input type="time" value={startTime} onChange={e => setStartTime(e.target.value)} step="60" className="form-custom" />
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-1 block text-text-main">Tugash vaqti</label>
+                  <input type="time" value={endTime} onChange={e => setEndTime(e.target.value)} step="60" className="form-custom" />
+                </div>
               </div>
 
               <div className="flex gap-3 pt-2">

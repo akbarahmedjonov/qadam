@@ -13,10 +13,11 @@ export default function HomeworkModal() {
   const [subject, setSubject] = useState(editing?.subject || '')
   const [dueDate, setDueDate] = useState(editing?.dueDate || '')
   const [type, setType] = useState(editing?.type || 'homework')
+  const [grade, setGrade] = useState(editing?.grade || '')
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    const taskData = { title: title.trim(), subject, dueDate, type }
+    const taskData = { title: title.trim(), subject, dueDate, type, grade: grade || null }
 
     if (isEditing) {
       updateHomework(editing.id, taskData)
@@ -125,6 +126,24 @@ export default function HomeworkModal() {
                   </label>
                 </div>
               </div>
+
+              {type === 'summative' && (
+                <div>
+                  <label className="text-sm font-medium mb-1 block text-text-main">Baho (1-100)</label>
+                  <input
+                    type="number"
+                    value={grade}
+                    onChange={e => {
+                      const val = e.target.value
+                      if (val === '' || (Number(val) >= 0 && Number(val) <= 100)) setGrade(val)
+                    }}
+                    min={1}
+                    max={100}
+                    className="form-custom"
+                    placeholder="Bahoni kiriting"
+                  />
+                </div>
+              )}
 
               <div className="flex gap-3 pt-2">
                 <button

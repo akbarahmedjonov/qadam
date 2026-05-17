@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { CalendarCheck, BookOpen, Gamepad2, User, Book, CalendarDays } from 'lucide-react'
+import { CalendarCheck, BookOpen, Gamepad2, User, Book, CalendarDays, Star } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 import { getCurrentDay, formatTime, timeToMinutes, formatFullDate } from '../utils/helpers'
 
@@ -11,6 +11,15 @@ export default function HomePage() {
     .filter(c => c.day === today)
     .sort((a, b) => timeToMinutes(a.startTime) - timeToMinutes(b.startTime))
   const pending = homework.filter(h => !h.completed).length
+
+  const subjectAverages = homework
+    .filter(h => h.type === 'summative' && h.grade)
+    .reduce((acc, h) => {
+      if (!acc[h.subject]) acc[h.subject] = { sum: 0, count: 0 }
+      acc[h.subject].sum += Number(h.grade)
+      acc[h.subject].count += 1
+      return acc
+    }, {})
 
   const userName = userProfile?.name || "O'quvchi"
   const hasPhoto = userProfile?.photo
@@ -70,7 +79,24 @@ export default function HomePage() {
                     <small className="text-text-dim font-mono text-xs">
                       {formatTime(cls.startTime)} - {formatTime(cls.endTime)}
                     </small>
-                    <h6 className="font-semibold mt-1 mb-0">{cls.name}</h6>
+                    <div className="flex items-center gap-2 mt-1">
+                      <h6 className="font-semibold mb-0">{cls.name}</h6>
+                      {(() => {
+                        const avg = subjectAverages[cls.name]
+                        if (!avg) return null
+                        const score = Math.round(avg.sum / avg.count)
+                        return (
+                          <span className={`inline-flex items-center gap-0.5 text-xs font-semibold px-1.5 py-0.5 rounded-full ${
+                            score >= 80 ? 'bg-lime/15 text-lime' :
+                            score >= 60 ? 'bg-yellow-500/15 text-yellow-500' :
+                            'bg-red-500/15 text-red-500'
+                          }`}>
+                            <Star className="w-2.5 h-2.5" />
+                            {score}
+                          </span>
+                        )
+                      })()}
+                    </div>
                   </div>
                   <Book className="w-6 h-6 text-cyan" />
                 </div>

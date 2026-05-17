@@ -1,12 +1,21 @@
 import { motion } from 'framer-motion'
-import { PlusCircle, Pencil, Trash2 } from 'lucide-react'
+import { PlusCircle, Pencil, Trash2, Star } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 import { DAY_NAMES, DAY_DISPLAY } from '../utils/constants'
 import { formatTime, timeToMinutes, getCurrentDay } from '../utils/helpers'
 
 export default function TimetablePage() {
-  const { classes, openModal, deleteClass } = useApp()
+  const { classes, homework, openModal, deleteClass } = useApp()
   const today = getCurrentDay()
+
+  const subjectAverages = homework
+    .filter(h => h.type === 'summative' && h.grade)
+    .reduce((acc, h) => {
+      if (!acc[h.subject]) acc[h.subject] = { sum: 0, count: 0 }
+      acc[h.subject].sum += Number(h.grade)
+      acc[h.subject].count += 1
+      return acc
+    }, {})
 
   return (
     <motion.div
@@ -54,7 +63,24 @@ export default function TimetablePage() {
                         <small className="text-text-dim font-mono text-xs">
                           {formatTime(cls.startTime)} - {formatTime(cls.endTime)}
                         </small>
-                        <div className="font-medium text-sm truncate">{cls.name}</div>
+                        <div className="font-medium text-sm truncate flex items-center gap-2">
+                          {cls.name}
+                          {(() => {
+                            const avg = subjectAverages[cls.name]
+                            if (!avg) return null
+                            const score = Math.round(avg.sum / avg.count)
+                            return (
+                              <span className={`inline-flex items-center gap-0.5 text-xs font-semibold px-1.5 py-0.5 rounded-full ${
+                                score >= 80 ? 'bg-lime/15 text-lime' :
+                                score >= 60 ? 'bg-yellow-500/15 text-yellow-500' :
+                                'bg-red-500/15 text-red-500'
+                              }`}>
+                                <Star className="w-2.5 h-2.5" />
+                                {score}
+                              </span>
+                            )
+                          })()}
+                        </div>
                       </div>
                       <div className="flex gap-1 shrink-0 ml-2">
                         <button

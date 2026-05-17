@@ -115,4 +115,8 @@
   .neon-glow-lime {
     box-shadow: 0 0 20px hsla(152, 69%, 31%, 0.4);
   }
+
+  .neon-glow-yellow {
+    box-shadow: 0 0 20px hsla(48, 96%, 53%, 0.4);
+  }
 }

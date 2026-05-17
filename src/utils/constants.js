@@ -5,8 +5,8 @@ export const STORAGE_KEYS = {
   userProfile: 'qadam_user',
 }
 
-export const DAY_NAMES = ['dushanba', 'seshanba', 'chorshanba', 'payshanba', 'juma', 'shanba']
-export const DAY_DISPLAY = ['Dush', 'Sesh', 'Chor', 'Pay', 'Jum', 'Shan']
+export const DAY_NAMES = ['dushanba', 'seshanba', 'chorshanba', 'payshanba', 'juma', 'shanba', 'yakshanba']
+export const DAY_DISPLAY = ['Dush', 'Sesh', 'Chor', 'Pay', 'Jum', 'Shan', 'Yak']
 
 export const MAX_RECENT_SUBJECTS = 10
 

@@ -79,30 +79,30 @@ export default function ProfileModal() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60"
+          className="fixed inset-0 z-50 flex items-start sm:items-center justify-center pt-12 sm:p-4 bg-black/60 overflow-y-auto"
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="card-custom w-full max-w-md p-0 overflow-hidden"
+            className="card-custom w-full max-w-md p-0 my-auto"
           >
-            <div className="p-5 border-b border-border flex items-center justify-between">
-              <h5 className="font-heading font-semibold mb-0 flex items-center gap-2">
-                <UserCircle className="w-5 h-5 text-cyan" />
-                Profil sozlamalari
+            <div className="p-4 sm:p-5 border-b border-border flex items-center gap-2">
+              <div className="flex items-center gap-2 min-w-0 flex-1">
+                <UserCircle className="w-5 h-5 text-cyan shrink-0" />
+                <h5 className="font-heading font-semibold mb-0 truncate">Profil sozlamalari</h5>
                 {userProfile?.email && (
-                  <span className="ml-auto text-xs text-text-dim font-normal">{userProfile.email}</span>
+                  <span className="hidden sm:inline text-xs text-text-dim font-normal truncate ml-auto">{userProfile.email}</span>
                 )}
-              </h5>
+              </div>
               <button
                 onClick={() => closeModal('profile')}
-                className="p-1 text-text-dim hover:text-text-main transition-colors"
+                className="p-1 text-text-dim hover:text-text-main transition-colors shrink-0"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <form onSubmit={handleSubmit} className="p-5">
+            <form onSubmit={handleSubmit} className="p-4 sm:p-5">
               <div className="text-center mb-4">
                 <div className="relative inline-block">
                   <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-cyan">

@@ -1,12 +1,31 @@
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { PlusCircle, Pencil, Trash2, Trophy, CheckCircle } from 'lucide-react'
+import { PlusCircle, Pencil, Trash2, Trophy, CheckCircle, Star, AlertTriangle } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 
 export default function HomeworkPage() {
-  const { homework, openModal, toggleHomework, deleteHomework } = useApp()
+  const { homework, openModal, toggleHomework, deleteHomework, addToast } = useApp()
+  const [gradeNotified, setGradeNotified] = useState(false)
 
   const pending = homework.filter(h => !h.completed)
   const completed = homework.filter(h => h.completed)
+
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  const needsGrade = pending.filter(t =>
+    t.type === 'summative' &&
+    !t.grade &&
+    t.dueDate &&
+    new Date(t.dueDate) <= today
+  )
+
+  useEffect(() => {
+    if (needsGrade.length > 0 && !gradeNotified) {
+      setGradeNotified(true)
+      addToast(`${needsGrade.length} ta nazorat ishiga baho qo'yilmagan`, 'warning')
+    }
+  }, [needsGrade.length, gradeNotified, addToast])
 
   return (
     <motion.div
@@ -25,19 +44,42 @@ export default function HomeworkPage() {
         </button>
       </div>
 
+      {needsGrade.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="card-custom p-3 mb-4 border-2 border-yellow-500/50 bg-yellow-500/5"
+        >
+          <div className="flex items-center gap-3">
+            <AlertTriangle className="w-5 h-5 text-yellow-500 shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold text-sm mb-0">
+                {needsGrade.length} ta nazorat ishiga baho qo'yilmagan
+              </p>
+              <small className="text-text-dim">
+                Muddat o'tgan nazorat ishlari uchun baho kiriting
+              </small>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
       <h6 className="mb-3 text-cyan font-heading font-semibold">
         Bajarilmagan ({pending.length})
       </h6>
 
       {pending.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
-          {pending.map((task, i) => (
+          {pending.map((task, i) => {
+            const isOverdueSummative = task.type === 'summative' && !task.grade && task.dueDate && new Date(task.dueDate) <= today
+
+            return (
             <motion.div
               key={task.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: i * 0.03 }}
-              className={`card-custom p-3 ${task.type === 'summative' ? 'border-magenta neon-glow-magenta' : ''}`}
+              className={`card-custom p-3 ${task.type === 'summative' ? 'border-magenta neon-glow-magenta' : ''} ${isOverdueSummative ? 'border-yellow-500 neon-glow-yellow' : ''}`}
             >
               <div className="flex items-start gap-3">
                 <div className="mt-1">
@@ -51,10 +93,26 @@ export default function HomeworkPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     {task.type === 'summative' ? (
-                      <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full bg-magenta text-white">
-                        <Trophy className="w-3 h-3" />
-                        Nazorat ishi
-                      </span>
+                      <>
+                        <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full bg-magenta text-white">
+                          <Trophy className="w-3 h-3" />
+                          Nazorat ishi
+                        </span>
+                        {task.grade ? (
+                          <span className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-lime/15 text-lime ml-2">
+                            <Star className="w-3 h-3" />
+                            {task.grade}/100
+                          </span>
+                        ) : isOverdueSummative ? (
+                          <button
+                            onClick={() => openModal('homework', task)}
+                            className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-yellow-500/15 text-yellow-500 ml-2 hover:bg-yellow-500/25 transition-colors"
+                          >
+                            <AlertTriangle className="w-3 h-3" />
+                            Baho qo'yish
+                          </button>
+                        ) : null}
+                      </>
                     ) : (
                       <span className="inline-flex items-center text-xs font-medium px-2 py-0.5 rounded-full bg-border text-text-dim">
                         Uy vazifasi
@@ -83,7 +141,8 @@ export default function HomeworkPage() {
                 </div>
               </div>
             </motion.div>
-          ))}
+            )
+          })}
         </div>
       ) : (
         <motion.div

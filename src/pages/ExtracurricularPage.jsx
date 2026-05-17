@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
-import { PlusCircle, Pencil, Trash2, Gamepad2, Clock, Trophy, Palette, Users, Heart, Asterisk } from 'lucide-react'
+import { PlusCircle, Pencil, Trash2, Gamepad2, Clock, Calendar, Trophy, Palette, Users, Heart, Asterisk } from 'lucide-react'
 import { useApp } from '../context/AppContext'
+import { DAY_DISPLAY, DAY_NAMES } from '../utils/constants'
 
 const iconMap = {
   Trophy, Palette, Users, Heart, Asterisk,
@@ -62,15 +63,30 @@ export default function ExtracurricularPage() {
                   </div>
                 </div>
                 <h5 className="font-heading font-semibold mb-1">{act.name}</h5>
-                <small className="text-text-dim capitalize">{act.category}</small>
-                {act.schedule && (
+                <div className="flex items-center gap-2 flex-wrap">
+                  <small className="text-text-dim capitalize">{act.category}</small>
+                  {act.day && DAY_NAMES.includes(act.day) && (
+                    <small className="inline-flex items-center gap-0.5 text-xs font-medium px-1.5 py-0.5 rounded-full bg-lime/10 text-lime">
+                      <Calendar className="w-3 h-3" />
+                      {DAY_DISPLAY[DAY_NAMES.indexOf(act.day)]}
+                    </small>
+                  )}
+                </div>
+                {(act.startTime && act.endTime) ? (
+                  <div className="mt-3 pt-3 border-t border-border">
+                    <small className="text-text-dim flex items-center gap-1">
+                      <Clock className="w-3.5 h-3.5" />
+                      {act.startTime} - {act.endTime}
+                    </small>
+                  </div>
+                ) : act.schedule ? (
                   <div className="mt-3 pt-3 border-t border-border">
                     <small className="text-text-dim flex items-center gap-1">
                       <Clock className="w-3.5 h-3.5" />
                       {act.schedule}
                     </small>
                   </div>
-                )}
+                ) : null}
               </motion.div>
             )
           })}

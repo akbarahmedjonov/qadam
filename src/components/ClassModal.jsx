@@ -87,11 +87,11 @@ export default function ClassModal() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-sm font-medium mb-1 block text-text-main">Boshlanish vaqti</label>
-                  <input type="time" value={startTime} onChange={e => setStartTime(e.target.value)} required className="form-custom" />
+                  <input type="time" value={startTime} onChange={e => setStartTime(e.target.value)} required step="60" className="form-custom" />
                 </div>
                 <div>
                   <label className="text-sm font-medium mb-1 block text-text-main">Tugash vaqti</label>
-                  <input type="time" value={endTime} onChange={e => setEndTime(e.target.value)} required className="form-custom" />
+                  <input type="time" value={endTime} onChange={e => setEndTime(e.target.value)} required step="60" className="form-custom" />
                 </div>
               </div>
 
