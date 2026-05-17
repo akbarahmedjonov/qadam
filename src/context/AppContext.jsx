@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef, startTransition } from 'react'
 import { auth, db } from '../firebase'
-import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut as firebaseSignOut, updateProfile as firebaseUpdateProfile, sendPasswordResetEmail } from 'firebase/auth'
+import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut as firebaseSignOut, updateProfile as firebaseUpdateProfile } from 'firebase/auth'
 import { collection, doc, addDoc, updateDoc, deleteDoc, setDoc, getDoc, onSnapshot } from 'firebase/firestore'
 import { STORAGE_KEYS, MAX_RECENT_SUBJECTS } from '../utils/constants'
 import { generateId } from '../utils/helpers'
@@ -444,11 +444,6 @@ export function AppProvider({ children }) {
     }
   }, [])
 
-  const resetPassword = useCallback(async (email) => {
-    if (!auth) { throw new Error('Firebase auth not initialized') }
-    await sendPasswordResetEmail(auth, email)
-  }, [])
-
   const signOut = useCallback(async () => {
     if (auth) {
       try { await firebaseSignOut(auth) } catch (e) { console.error('Sign out error:', e) }
@@ -504,7 +499,7 @@ export function AppProvider({ children }) {
       addHomework, updateHomework, toggleHomework, deleteHomework,
       addActivity, updateActivity, deleteActivity,
       saveProfile, updateProfile,
-      signIn, signUp, resetPassword, signOut,
+      signIn, signUp, signOut,
     }}>
       {children}
     </AppContext.Provider>

@@ -1,15 +1,20 @@
 import { useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { UserCircle, Camera, User, X, Key, Loader2 } from 'lucide-react'
+import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from 'firebase/auth'
 import { useApp } from '../context/AppContext'
 import { auth } from '../firebase'
 
 export default function ProfileModal() {
-  const { modals, closeModal, userProfile, updateProfile, addToast, resetPassword } = useApp()
+  const { modals, closeModal, userProfile, updateProfile, addToast } = useApp()
   const [name, setName] = useState(userProfile?.name || '')
   const [surname, setSurname] = useState(userProfile?.surname || '')
   const [preview, setPreview] = useState(userProfile?.photo || null)
   const [pwLoading, setPwLoading] = useState(false)
+  const [oldPassword, setOldPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [showPasswordForm, setShowPasswordForm] = useState(false)
   const fileRef = useRef(null)
 
   const handleFile = (e) => {
@@ -35,15 +40,33 @@ export default function ProfileModal() {
     closeModal('profile')
   }
 
-  const handleResetPassword = async () => {
+  const handleChangePassword = async (e) => {
+    e.preventDefault()
     if (!auth?.currentUser?.email) return
+    if (newPassword !== confirmPassword) {
+      addToast('Yangi parollar mos kelmadi', 'error')
+      return
+    }
+    if (newPassword.length < 6) {
+      addToast('Yangi parol kamida 6 belgidan iborat bo\'lishi kerak', 'error')
+      return
+    }
     setPwLoading(true)
     try {
-      await resetPassword(auth.currentUser.email)
-      addToast('Parolni tiklash havolasi emailingizga yuborildi', 'success')
-      closeModal('profile')
-    } catch {
-      addToast('Xatolik yuz berdi. Qayta urinib ko\'ring', 'error')
+      const credential = EmailAuthProvider.credential(auth.currentUser.email, oldPassword)
+      await reauthenticateWithCredential(auth.currentUser, credential)
+      await updatePassword(auth.currentUser, newPassword)
+      addToast('Parol muvaffaqiyatli o\'zgartirildi', 'success')
+      setShowPasswordForm(false)
+      setOldPassword('')
+      setNewPassword('')
+      setConfirmPassword('')
+    } catch (err) {
+      if (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+        addToast('Eski parol noto\'g\'ri', 'error')
+      } else {
+        addToast('Xatolik yuz berdi. Qayta urinib ko\'ring', 'error')
+      }
     } finally {
       setPwLoading(false)
     }
@@ -126,21 +149,84 @@ export default function ProfileModal() {
               </div>
 
               <div className="mt-5 pt-4 border-t border-border">
-                <motion.button
-                  type="button"
-                  onClick={handleResetPassword}
-                  disabled={pwLoading}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="btn-custom w-full border border-border text-text-dim hover:text-text-main hover:bg-border transition-colors flex items-center justify-center gap-2 disabled:opacity-60"
-                >
-                  {pwLoading ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
+                {!showPasswordForm ? (
+                  <motion.button
+                    type="button"
+                    onClick={() => setShowPasswordForm(true)}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="btn-custom w-full border border-border text-text-dim hover:text-text-main hover:bg-border transition-colors flex items-center justify-center gap-2"
+                  >
                     <Key className="w-4 h-4" />
-                  )}
-                  Parolni o'zgartirish
-                </motion.button>
+                    Parolni o'zgartirish
+                  </motion.button>
+                ) : (
+                  <form onSubmit={handleChangePassword} className="space-y-3">
+                    <div>
+                      <label className="text-sm font-medium mb-1 block text-text-main">Eski parol</label>
+                      <input
+                        type="password"
+                        value={oldPassword}
+                        onChange={e => setOldPassword(e.target.value)}
+                        required
+                        className="form-custom"
+                        placeholder="Eski parolingizni kiriting"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium mb-1 block text-text-main">Yangi parol</label>
+                      <input
+                        type="password"
+                        value={newPassword}
+                        onChange={e => setNewPassword(e.target.value)}
+                        required
+                        minLength={6}
+                        className="form-custom"
+                        placeholder="Yangi parolingizni kiriting"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium mb-1 block text-text-main">Yangi parolni takrorlang</label>
+                      <input
+                        type="password"
+                        value={confirmPassword}
+                        onChange={e => setConfirmPassword(e.target.value)}
+                        required
+                        minLength={6}
+                        className="form-custom"
+                        placeholder="Yangi parolingizni qayta kiriting"
+                      />
+                    </div>
+                    <div className="flex gap-3 pt-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowPasswordForm(false)
+                          setOldPassword('')
+                          setNewPassword('')
+                          setConfirmPassword('')
+                        }}
+                        className="btn-custom flex-1 border border-border text-text-dim hover:text-text-main hover:bg-border transition-colors"
+                      >
+                        Bekor qilish
+                      </button>
+                      <motion.button
+                        type="submit"
+                        disabled={pwLoading}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        className="btn-custom btn-cyan flex-1 flex items-center justify-center gap-2 disabled:opacity-60"
+                      >
+                        {pwLoading ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Key className="w-4 h-4" />
+                        )}
+                        O'zgartirish
+                      </motion.button>
+                    </div>
+                  </form>
+                )}
               </div>
 
               <div className="flex gap-3 mt-4">
