@@ -36,7 +36,7 @@ export default function ProfileModal() {
   }
 
   const handleResetPassword = async () => {
-    if (!auth.currentUser?.email) return
+    if (!auth?.currentUser?.email) return
     setPwLoading(true)
     try {
       await resetPassword(auth.currentUser.email)

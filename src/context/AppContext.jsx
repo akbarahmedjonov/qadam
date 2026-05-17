@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback, useRef, startTransition } from 'react'
 import { auth, db } from '../firebase'
 import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut as firebaseSignOut, updateProfile as firebaseUpdateProfile, sendPasswordResetEmail } from 'firebase/auth'
 import { collection, doc, addDoc, updateDoc, deleteDoc, setDoc, getDoc, onSnapshot } from 'firebase/firestore'
@@ -43,6 +43,13 @@ export function AppProvider({ children }) {
   }, [])
 
   useEffect(() => {
+    if (!auth) {
+      startTransition(() => {
+        setAuthLoading(false)
+        setDataLoading(false)
+      })
+      return
+    }
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user)
       if (user) {
@@ -88,6 +95,14 @@ export function AppProvider({ children }) {
     }
 
     if (!currentUser) return
+
+    if (!db) {
+      startTransition(() => {
+        setDataLoading(false)
+        addToast("Ma'lumotlar bazasi ulanishi mavjud emas. Offline rejimda ishlaysiz.", 'error')
+      })
+      return
+    }
 
     const uid = currentUser.uid
     const loaded = { classes: false, homework: false, extracurriculars: false }
@@ -214,12 +229,12 @@ export function AppProvider({ children }) {
   }, [])
 
   const col = useCallback((sub) => {
-    if (!currentUser) return null
+    if (!currentUser || !db) return null
     return collection(db, 'users', currentUser.uid, sub)
   }, [currentUser])
 
   const docRef = useCallback((sub, id) => {
-    if (!currentUser) return null
+    if (!currentUser || !db) return null
     return doc(db, 'users', currentUser.uid, sub, id)
   }, [currentUser])
 
@@ -413,10 +428,12 @@ export function AppProvider({ children }) {
   }, [docRef, addToast])
 
   const signIn = useCallback(async (email, password) => {
+    if (!auth) { throw new Error('Firebase auth not initialized') }
     await signInWithEmailAndPassword(auth, email, password)
   }, [])
 
   const signUp = useCallback(async (email, password, displayName) => {
+    if (!auth) { throw new Error('Firebase auth not initialized') }
     const cred = await createUserWithEmailAndPassword(auth, email, password)
     if (displayName) {
       try {
@@ -428,11 +445,14 @@ export function AppProvider({ children }) {
   }, [])
 
   const resetPassword = useCallback(async (email) => {
+    if (!auth) { throw new Error('Firebase auth not initialized') }
     await sendPasswordResetEmail(auth, email)
   }, [])
 
   const signOut = useCallback(async () => {
-    await firebaseSignOut(auth)
+    if (auth) {
+      try { await firebaseSignOut(auth) } catch (e) { console.error('Sign out error:', e) }
+    }
     setClasses([])
     setHomework([])
     setExtracurriculars([])
@@ -443,7 +463,7 @@ export function AppProvider({ children }) {
     const fullProfile = { ...profile, email: currentUser?.email }
     setUserProfile(fullProfile)
     localSet(STORAGE_KEYS.userProfile, fullProfile)
-    if (currentUser) {
+    if (currentUser && db) {
       try {
         await setDoc(doc(db, 'users', currentUser.uid), fullProfile)
         await firebaseUpdateProfile(currentUser, {
@@ -460,7 +480,7 @@ export function AppProvider({ children }) {
     const fullProfile = { ...profile, email: currentUser?.email }
     setUserProfile(fullProfile)
     localSet(STORAGE_KEYS.userProfile, fullProfile)
-    if (currentUser) {
+    if (currentUser && db) {
       try {
         await setDoc(doc(db, 'users', currentUser.uid), fullProfile)
         await firebaseUpdateProfile(currentUser, {
