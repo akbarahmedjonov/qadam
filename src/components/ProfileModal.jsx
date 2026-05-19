@@ -161,7 +161,7 @@ export default function ProfileModal() {
                     Parolni o'zgartirish
                   </motion.button>
                 ) : (
-                  <form onSubmit={handleChangePassword} className="space-y-3">
+                  <div className="space-y-3">
                     <div>
                       <label className="text-sm font-medium mb-1 block text-text-main">Eski parol</label>
                       <input
@@ -211,8 +211,9 @@ export default function ProfileModal() {
                         Bekor qilish
                       </button>
                       <motion.button
-                        type="submit"
+                        type="button"
                         disabled={pwLoading}
+                        onClick={handleChangePassword}
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         className="btn-custom btn-cyan flex-1 flex items-center justify-center gap-2 disabled:opacity-60"
@@ -225,7 +226,7 @@ export default function ProfileModal() {
                         O'zgartirish
                       </motion.button>
                     </div>
-                  </form>
+                  </div>
                 )}
               </div>
 
